@@ -1,9 +1,9 @@
 <template>
   <div style="margin: 2%;">
-    <topic-plate v-if="topic" :topicObject="topic"></topic-plate>
+    <topic-plate v-if="topic" :topicObject="topic" :topicReaction="topicReaction"></topic-plate>
 
     <div style="margin-top: 2%; overflow-y: auto;" v-for="commentary in commentaries" v-bind:key="commentary.id">
-      <commentary :commentaryObject="commentary"></commentary>
+      <commentary :commentaryObject="commentary" :userCommentaryReaction="getCommentaryReaction(commentary.id)"></commentary>
     </div>
 
     <div v-if="authObject" class="container">
@@ -29,14 +29,18 @@ export default {
     this.topicId = this.$route.params.id;
 
     await this.getTopic();
+    await this.getTopicReaction();
     await this.getCommentaries();
+    await this.getCommentariesReactions();
   },
   data() {
     return {
       topicId: 0,
       topic: null,
+      topicReaction: {},
       commentaries: [],
       commentaryText: "",
+      commentariesReactions: [],
     }
   },
   methods: {
@@ -46,12 +50,33 @@ export default {
         this.topic = response;
       }
     },
+    getTopicReaction: async function() {
+      let response = await apiClient.getUserTopicReaction(this.topicId);
+      if (response) {
+        this.topicReaction = response;
+      }
+    },
     getCommentaries: async function () {
       let response = await apiClient.getTopicCommentaries(this.topicId);
       
       if (typeof response == 'object') {
         this.commentaries = response.commentaries;
       }
+    },
+    getCommentariesReactions: async function () {
+      if (!this.authObject) {
+        return;
+      }
+
+      let response = await apiClient.getUserCommentariesReaction(this.topicId);
+      if (response) {
+        this.commentariesReactions = response.reactions;
+      }
+    },
+    getCommentaryReaction: function (id) {
+      let reaction = this.commentariesReactions.filter(reaction => reaction.id == id)[0];
+      console.log(reaction);
+      return reaction;
     },
     createCommentary: async function () {
       let response = await apiClient.createCommentary(this.topicId, { text: this.commentaryText });

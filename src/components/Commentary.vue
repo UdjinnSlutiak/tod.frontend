@@ -10,7 +10,7 @@
         </div>
         <div v-bind:class="getRatingClass(commentaryObject.rating)" style="margin: 0 8%; display: flex;">
           <span v-if="userContent || !authObject" style="margin-right: 8%;" class="material-icons">thumbs_up_down</span>
-          {{commentaryObject.rating}}
+          {{rating}}
         </div>
         <div @click="react(commentaryObject.id, -1)" v-if="!userContent && authObject" class="text-danger" style="cursor: pointer;">
           <span class="material-icons">thumb_down</span>
@@ -34,10 +34,14 @@ export default {
   name: "commentary",
   mounted: async function () {
     this.userContent = this.currentUserContent(this.commentaryObject.author.username);
+    this.rating = this.commentaryObject.rating;
+    this.reaction = this.userCommentaryReaction;
   },
   data() {
     return {
       userContent: false,
+      rating: 0,
+      reaction: {},
     }
   },
   methods: {
@@ -70,14 +74,37 @@ export default {
       return this.authObject.user.username == ownerUsername ? true : false;
     },
     react: async function (id, value) {
-      let response = await apiClient.reactOnCommentary(id, value);
-      return response == "OK" ? value : 0;
+      let response;
+      try {
+        response = await apiClient.reactOnCommentary(id, value);
+      } catch (error) {
+        return;
+      }
+
+      if (response != "OK") {
+        return;
+      }
+      this.rating += value;
+      console.log(this.reaction);
+      if (this.reaction) {
+        this.rating += this.reaction.reacted ? value : 0;
+      }
     },
   },
   props: {
     commentaryObject: {
       Type: Object,
     },
+    userCommentaryReaction: {
+      Type: Object,
+    },
+  },
+  watch: {
+    userCommentaryReaction(newValue) {
+      if (newValue) {
+        this.reaction = newValue;
+      }
+    }
   },
   computed: {
     authObject() {
