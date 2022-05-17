@@ -14,11 +14,14 @@
           <span class="material-icons">thumb_up</span>
         </div>
         <div v-bind:class="this.getRatingClass(topicObject.rating)" style="display: flex;">
-          <span v-if="userContent || !authObject" style="margin-right: 8%;" class="material-icons">thumbs_up_down</span>
-          {{topicObject.rating}}
+          <span v-if="userContent || !authObject" style="margin: 0 15%;" class="material-icons">thumbs_up_down</span>
+          {{rating}}
         </div>
         <div @click="react(topicObject.id, -1)" v-if="!userContent && authObject" class="text-danger">
             <span class="material-icons">thumb_down</span>
+        </div>
+        <div v-if="!userContent && authObject" style="margin: 0 15%;">
+            <span class="material-icons">bookmark_add</span>
         </div>
       </div>
       <div v-if="!userContent" style="text-align:right;">
@@ -38,10 +41,12 @@ export default {
   name: "topic-plate",
   mounted: async function () {
     this.userContent = this.currentUserContent(this.topicObject.author.username);
+    this.rating = this.topicObject.rating;
   },
   data() {
     return {
       userContent: false,
+      rating: 0,
     }
   },
   methods: {
@@ -68,18 +73,37 @@ export default {
       this.$router.push("/topic/" + id);
     },
     react: async function (id, value) {
-      let response = await apiClient.reactOnTopic(id, value);
-      return response == "OK" ? value : 0;
+      let response;
+      try {
+        response = await apiClient.reactOnTopic(id, value);
+      } catch (error) {
+        return;
+      }
+      
+      if (response != "OK") {
+        return;
+      }
+      this.rating += value;
+      console.log(this.reaction);
+      if (this.reaction) {
+        this.rating += this.reaction.reacted ? value : 0;
+      }
     },
   },
   props: {
     topicObject: {
       Type: Object,
     },
+    topicReaction: {
+      Type: Object,
+    },
   },
   watch: {
     topicObject(newValue) {
       this.topic = newValue;
+    },
+    topicReaction(newValue) {
+      this.reaction = newValue;
     },
   },
   computed: {

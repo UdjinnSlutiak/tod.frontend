@@ -199,7 +199,7 @@ async function getUserTopicReaction(id) {
 async function getUserCommentariesReaction(topicId) {
   let response = await fetchApi(
     getUrl({
-      suffix: apiUrls.reactions + apiUrls.commentaries + "/" + topicId
+      suffix: apiUrls.reactions + apiUrls.topics + "/" + topicId + apiUrls.commentaries
     }),
     requestOptionsService.get()
   );

@@ -3,6 +3,7 @@ import Home from "../views/Home.vue";
 import Login from "../views/Login.vue";
 import Feed from "../views/Feed.vue";
 import Topic from "../views/Topic.vue";
+import CreateTopic from "../views/CreateTopic.vue";
 
 const routes = [
   {
@@ -23,8 +24,13 @@ const routes = [
   {
     path: "/topic/:id",
     name: "Topic",
-    component: Topic
-  }
+    component: Topic,
+  },
+  {
+    path: "/topic/create",
+    name: "CreateTopic",
+    component: CreateTopic,
+  },
 ];
 
 const router = createRouter({

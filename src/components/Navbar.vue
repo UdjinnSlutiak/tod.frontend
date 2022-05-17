@@ -7,23 +7,23 @@
       <router-link to="/feed" class="nav-item nav-item-left">
         <span class="material-icons">dashboard</span>
       </router-link>
-      <router-link to="" class="nav-item nav-item-left" v-if="authObject">
-        <span class="material-icons">bookmarks</span>
-      </router-link>
-      <router-link to="" class="nav-item nav-item-left" v-if="authObject">
-        <span class="material-icons">question_answer</span>
-      </router-link>
-      <router-link to="" class="nav-item nav-item-left" v-if="authObject">
-        <span class="material-icons">post_add</span>
-      </router-link>
-      <router-link to="" class="nav-item nav-item-left" v-if="authObject">
-        <span class="material-icons">article</span>
-      </router-link>
       <router-link to="" class="nav-item nav-item-left">
         <span class="material-icons">search</span>
       </router-link>
     </div>
     <div class="navbar-container" style="text-align: right;">
+      <router-link to="/topic/create" class="nav-item nav-item-right" v-if="authObject">
+        <span class="material-icons">post_add</span>
+      </router-link>
+      <router-link to="" class="nav-item nav-item-right" v-if="authObject">
+        <span class="material-icons">bookmarks</span>
+      </router-link>
+      <router-link to="" class="nav-item nav-item-right" v-if="authObject">
+        <span class="material-icons">question_answer</span>
+      </router-link>
+      <router-link to="" class="nav-item nav-item-right" v-if="authObject">
+        <span class="material-icons">article</span>
+      </router-link>
       <router-link to="" class="nav-item nav-item-right" v-if="authObject">
         <span class="material-icons">account_circle</span>
       </router-link>
