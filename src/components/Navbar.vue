@@ -16,7 +16,7 @@
         <span class="material-icons">post_add</span>
       </router-link>
       <router-link active-class="active-item" to="/profile" class="nav-item nav-item-right" v-if="authObject">
-        <span class="material-icons">account_circle</span>
+        <span class="material-icons">manage_accounts</span>
       </router-link>
       <router-link @click="logout" to="" class="nav-item nav-item-right" v-if="authObject">
         <span class="material-icons">logout</span>

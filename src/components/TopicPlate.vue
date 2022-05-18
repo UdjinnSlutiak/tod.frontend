@@ -11,19 +11,19 @@
     <div class="topic-info">
       <div style="display: flex; z-index: 10;">
         <div @click="react(topicObject.id, 1)" v-if="!userContent && authObject" class="text-success">
-          <span class="material-icons">thumb_up</span>
+          <span class="material-icons reaction" :class="{'reacted': reactedPositive && reacted}">thumb_up</span>
         </div>
-        <div v-bind:class="this.getRatingClass(topicObject.rating)" style="display: flex;">
-          <span v-if="userContent || !authObject" style="margin: 0 15%;" class="material-icons">thumbs_up_down</span>
+        <div :class="{'text-success': rating > 0, 'text-danger': rating < 0}" style="display: flex; margin: 0 10%;">
+          <span v-if="userContent || !authObject" class="material-icons">thumbs_up_down</span>
           {{rating}}
         </div>
         <div @click="react(topicObject.id, -1)" v-if="!userContent && authObject" class="text-danger">
-            <span class="material-icons">thumb_down</span>
+            <span class="material-icons reaction" :class="{'reacted': !reactedPositive && reacted}">thumb_down</span>
         </div>
-        <div @click="addToFavorites()" v-if="!userContent && authObject && !topicObject.isInFavorite" style="margin: 0 15%;">
+        <div @click="addToFavorites()" v-if="!userContent && authObject && !isInFavorite" style="margin: 0 15%;">
             <span class="material-icons">bookmark_add</span>
         </div>
-        <div v-if="!userContent && authObject && topicObject.isInFavorite" class="text-success" style="margin: 0 15%;">
+        <div v-if="!userContent && authObject && isInFavorite" class="text-success" style="margin: 0 15%;">
             <span class="material-icons">bookmark_added</span>
         </div>
       </div>
@@ -46,27 +46,24 @@ export default {
     this.userContent = this.currentUserContent(this.topicObject.author.username);
     this.rating = this.topicObject.rating;
     this.isInFavorite = this.topicObject.isInFavorite;
+    
+    if (this.authObject && !this.userContent) {
+      await this.getReaction();
+    }
   },
   data() {
     return {
       userContent: false,
       rating: 0,
       isInFavorite: false,
+      reactedPositive: false,
+      reacted: false,
     }
   },
   methods: {
     getDateTime(date) {
       let dateTime = new Date(date);
       return dateTime.toLocaleString();
-    },
-    getRatingClass(rating) {
-      if (rating > 0) {
-        return 'text-success';
-      }
-      if (rating < 0) {
-        return 'text-danger';
-      }
-      return '';
     },
     currentUserContent(ownerUsername) {
       if (!this.authObject) {
@@ -92,6 +89,8 @@ export default {
       console.log(this.reaction);
       if (this.reaction) {
         this.rating += this.reaction.reacted ? value : 0;
+        this.reacted = true;
+        this.reactedPositive = value == 1;
       }
     },
     addToFavorites: async function () {
@@ -104,6 +103,13 @@ export default {
       if (response) {
         this.isInFavorite = true;
         return;
+      }
+    },
+    getReaction: async function () {
+      let response = await apiClient.getUserTopicReaction(this.topicObject.id);
+      if (typeof response == 'object') {
+        this.reactedPositive = response.reactedPositive;
+        this.reacted = response.reacted;
       }
     },
   },
@@ -177,5 +183,12 @@ export default {
 .text-danger {
   color:indianred !important;
   opacity: 0.9 !important;
+}
+.reacted {
+  background-color: white;
+  border-radius: 5px;
+}
+.reaction {
+  padding: 10%;
 }
 </style>

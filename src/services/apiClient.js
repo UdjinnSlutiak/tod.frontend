@@ -6,9 +6,11 @@ import store from "../store";
 export default {
   login,
   register,
+  getMe,
   getTopic,
   getTopics,
   getFavorites,
+  getMyTopics,
   createTopic,
   addToFavorites,
   searchTopics,
@@ -16,6 +18,7 @@ export default {
   createCommentary,
   getUserTopicReaction,
   getUserCommentariesReaction,
+  getUserCommentaryReaction,
   reactOnTopic,
   reactOnCommentary,
 }
@@ -38,6 +41,8 @@ const apiUrls = {
   reactions: "/reactions",
   favorites: "/favorites",
   search: "/search",
+  my: "/my",
+  me: "/me",
 }
 
 function getUrl({
@@ -75,6 +80,17 @@ async function register(registrationObject) {
       suffix: apiUrls.register
     }),
     requestOptionsService.post(registrationObject)
+  );
+
+  return response;
+}
+
+async function getMe() {
+  let response = await fetchApi(
+    getUrl({
+      suffix: apiUrls.account + apiUrls.me
+    }),
+    requestOptionsService.get()
   );
 
   return response;
@@ -123,6 +139,17 @@ async function getFavorites() {
   let response = await fetchApi(
     getUrl({
       suffix: apiUrls.topics + apiUrls.favorites
+    }),
+    requestOptionsService.get()
+  );
+
+  return response;
+}
+
+async function getMyTopics() {
+  let response = await fetchApi(
+    getUrl({
+      suffix: apiUrls.topics + apiUrls.my
     }),
     requestOptionsService.get()
   );
@@ -200,6 +227,17 @@ async function getUserCommentariesReaction(topicId) {
   let response = await fetchApi(
     getUrl({
       suffix: apiUrls.reactions + apiUrls.topics + "/" + topicId + apiUrls.commentaries
+    }),
+    requestOptionsService.get()
+  );
+
+  return response;
+}
+
+async function getUserCommentaryReaction(commentaryId) {
+  let response = await fetchApi(
+    getUrl({
+      suffix: apiUrls.reactions + apiUrls.commentaries + "/" + commentaryId,
     }),
     requestOptionsService.get()
   );
