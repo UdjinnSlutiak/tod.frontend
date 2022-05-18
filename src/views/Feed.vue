@@ -1,13 +1,13 @@
 <template>
   <div style="margin: 1% 2% 2% 2%;">
     <div style="margin-bottom: 1%; display: flex;">
-      <div v-if="authObject" @click="getFavorites()" :class="isFavoriteActive ? 'item-active' : 'item-inactive'" class="filter-item">
+      <div v-if="authObject" @click="getFavorites()" :class="{'active-item': isFavoriteActive}" class="filter-item">
         <span class="material-icons">bookmarks</span>
       </div>
-      <div v-if="authObject" @click="getDiscussed()" :class="isDiscussedActive ? 'item-active' : 'item-inactive'" class="filter-item">
+      <div v-if="authObject" @click="getDiscussed()" :class="{'active-item': isDisscussedActive}" class="filter-item">
         <span class="material-icons">question_answer</span>
       </div>
-      <div v-if="authObject" @click="getMy()" :class="isMyActive ? 'item-active' : 'item-inactive'" class="filter-item">
+      <div v-if="authObject" @click="getMy()" :class="{'active-item': isMyActive}" class="filter-item">
         <span class="material-icons">article</span>
       </div>
     </div>
@@ -33,35 +33,41 @@ export default {
       topics: [],
       skip: 0,
       offset: 20,
-      filters: [
-        { name: "favorites", active: false, },
-        { name: "discussed", active: false, },
-        { name: "my", active: false, },
-      ],
-      isFavoriteActive: this.filters.find(_ => _.name == 'favorite').active,
-      isDiscussedActive: this.filters.find(_ => _.name == 'discussed').active,
-      isMyActive: this.filters.find(_ => _.name == 'my').active,
+      isFavoriteActive: false,
+      isDisscussedActive: false,
+      isMyActive: false,
     }
   },
   methods: {
     getLatestTopics: async function () {
       let topics =  await apiClient.getTopics(this.skip, this.offset);
       if (typeof topics == 'object') {
-        this.topics = topics.topics;
+          this.topics = topics.topics;
       }
     },
     getFavorites: async function () {
-      this.setActiveFilter("favorites");
+      this.setActiveFilter({ favorites: true });
+      let favorites = await apiClient.getFavorites();
+      
+      if (favorites) {
+        this.topics = favorites.topics;
+      }
     },
     getDiscussed: async function () {
-      this.setActiveFilter("discussed");
+      this.setActiveFilter({ discussed: true });
     },
     getMy: async function () {
-      this.setActiveFilter("my");
+      this.setActiveFilter({ my: true });
+      let my = await apiClient.getMyTopics();
+
+      if (my) {
+        this.topics = my.topics;
+      }
     },
-    setActiveFilter(name) {
-      this.filters.forEach(filter => filter.active = false);
-      this.filters.find(filter => filter.name == name).active = true;
+    setActiveFilter({discussed = false, favorites = false, my = false}) {
+      this.isFavoriteActive = favorites;
+      this.isDisscussedActive = discussed;
+      this.isMyActive = my;
     },
   },
   computed: {
@@ -82,7 +88,7 @@ export default {
 .filter-item:hover {
   color: #00C896;
 }
-.item-inactive {
+.inactive-item {
   color: #F2ECFF;
 }
 </style>

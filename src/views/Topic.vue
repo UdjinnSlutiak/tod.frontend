@@ -79,7 +79,7 @@ export default {
     },
     getCommentaryReaction: function (id) {
       let reaction = this.commentariesReactions.filter(reaction => reaction.id == id)[0];
-      console.log(reaction);
+      
       return reaction;
     },
     createCommentary: async function () {

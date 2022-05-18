@@ -6,14 +6,14 @@
     <div class="commentary-info">
       <div style="display: flex; z-index: 10;">
         <div @click="react(commentaryObject.id, 1)" v-if="!userContent && authObject" class="text-success" style="cursor: pointer;">
-          <span class="material-icons">thumb_up</span>
+          <span class="material-icons reaction" :class="{'reacted': reactedPositive && reacted}">thumb_up</span>
         </div>
-        <div v-bind:class="getRatingClass(commentaryObject.rating)" style="margin: 0 8%; display: flex;">
+        <div v-bind:class="{'text-success': rating > 0, 'text-danger': rating < 0}" style="margin: 0 8%; display: flex;">
           <span v-if="userContent || !authObject" style="margin-right: 8%;" class="material-icons">thumbs_up_down</span>
           {{rating}}
         </div>
         <div @click="react(commentaryObject.id, -1)" v-if="!userContent && authObject" class="text-danger" style="cursor: pointer;">
-          <span class="material-icons">thumb_down</span>
+          <span class="material-icons reaction" :class="{'reacted': !reactedPositive && reacted}">thumb_down</span>
         </div>
       </div>
       <div v-if="!userContent">
@@ -29,19 +29,19 @@
 <script>
 import apiClient from "../services/apiClient";
 
-
 export default {
   name: "commentary",
   mounted: async function () {
     this.userContent = this.currentUserContent(this.commentaryObject.author.username);
     this.rating = this.commentaryObject.rating;
-    this.reaction = this.userCommentaryReaction;
   },
   data() {
     return {
       userContent: false,
       rating: 0,
       reaction: {},
+      reacted: false,
+      reactedPositive: false,
     }
   },
   methods: {
@@ -53,15 +53,6 @@ export default {
         return 'your-commentary';
       }
       return 'another-commentary';
-    },
-    getRatingClass(rating) {
-      if (rating > 0) {
-        return 'text-success';
-      }
-      if (rating < 0) {
-        return 'text-danger';
-      }
-      return '';
     },
     getDateTime(date) {
       let dateTime = new Date(date);
@@ -85,10 +76,10 @@ export default {
         return;
       }
       this.rating += value;
-      console.log(this.reaction);
-      if (this.reaction) {
-        this.rating += this.reaction.reacted ? value : 0;
-      }
+
+      this.rating += this.reaction.reacted ? value : 0;
+      this.reacted = true;
+      this.reactedPositive = value == 1;
     },
   },
   props: {
@@ -103,6 +94,8 @@ export default {
     userCommentaryReaction(newValue) {
       if (newValue) {
         this.reaction = newValue;
+        this.reacted = newValue.reacted;
+        this.reactedPositive = newValue.reactedPositive;
       }
     }
   },
