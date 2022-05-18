@@ -4,6 +4,8 @@ import Login from "../views/Login.vue";
 import Feed from "../views/Feed.vue";
 import Topic from "../views/Topic.vue";
 import CreateTopic from "../views/CreateTopic.vue";
+import Search from "../views/Search.vue";
+import Profile from "../views/Profile.vue";
 
 const routes = [
   {
@@ -19,7 +21,12 @@ const routes = [
   {
     path: "/feed",
     name: "Feed",
-    component: Feed
+    component: Feed,
+  },
+  {
+    path: "/search",
+    name: "Search",
+    component: Search,
   },
   {
     path: "/topic/:id",
@@ -30,6 +37,17 @@ const routes = [
     path: "/topic/create",
     name: "CreateTopic",
     component: CreateTopic,
+    meta: {
+      authorize: [ "User", "Administrator", "Moderator" ]
+    },
+  },
+  {
+    path: "/profile",
+    name: "Profile",
+    component: Profile,
+    meta: {
+      authorize: [ "User", "Administrator", "Moderator" ]
+    },
   },
 ];
 

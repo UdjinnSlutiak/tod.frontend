@@ -51,6 +51,10 @@ export default {
       }
     },
     getTopicReaction: async function() {
+      if (!this.authObject) {
+        return;
+      }
+
       let response = await apiClient.getUserTopicReaction(this.topicId);
       if (response) {
         this.topicReaction = response;

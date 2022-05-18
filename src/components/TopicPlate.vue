@@ -20,8 +20,11 @@
         <div @click="react(topicObject.id, -1)" v-if="!userContent && authObject" class="text-danger">
             <span class="material-icons">thumb_down</span>
         </div>
-        <div v-if="!userContent && authObject" style="margin: 0 15%;">
+        <div @click="addToFavorites()" v-if="!userContent && authObject && !topicObject.isInFavorite" style="margin: 0 15%;">
             <span class="material-icons">bookmark_add</span>
+        </div>
+        <div v-if="!userContent && authObject && topicObject.isInFavorite" class="text-success" style="margin: 0 15%;">
+            <span class="material-icons">bookmark_added</span>
         </div>
       </div>
       <div v-if="!userContent" style="text-align:right;">
@@ -42,11 +45,13 @@ export default {
   mounted: async function () {
     this.userContent = this.currentUserContent(this.topicObject.author.username);
     this.rating = this.topicObject.rating;
+    this.isInFavorite = this.topicObject.isInFavorite;
   },
   data() {
     return {
       userContent: false,
       rating: 0,
+      isInFavorite: false,
     }
   },
   methods: {
@@ -87,6 +92,18 @@ export default {
       console.log(this.reaction);
       if (this.reaction) {
         this.rating += this.reaction.reacted ? value : 0;
+      }
+    },
+    addToFavorites: async function () {
+      if (this.isInFavorite) {
+        return;
+      }
+
+      let response = await apiClient.addToFavorites(this.topicObject.id);
+
+      if (response) {
+        this.isInFavorite = true;
+        return;
       }
     },
   },
@@ -154,11 +171,11 @@ export default {
   margin: 1% 1%;
 }
 .text-success {
-  color:greenyellow;
+  color:greenyellow !important;
   opacity: 0.9 !important;
 }
 .text-danger {
-  color:indianred;
+  color:indianred !important;
   opacity: 0.9 !important;
 }
 </style>
