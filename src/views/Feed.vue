@@ -1,6 +1,9 @@
 <template>
   <div style="margin: 1% 2% 2% 2%;">
     <div style="margin-bottom: 1%; display: flex;">
+      <div @click="getLatestTopics()" :class="{'active-item': isLatestActive}" class="filter-item">
+        <span class="material-icons">access_time_filled</span>
+      </div>
       <div v-if="authObject" @click="getFavorites()" :class="{'active-item': isFavoriteActive}" class="filter-item">
         <span class="material-icons">bookmarks</span>
       </div>
@@ -33,6 +36,7 @@ export default {
       topics: [],
       skip: 0,
       offset: 20,
+      isLatestActive: true,
       isFavoriteActive: false,
       isDisscussedActive: false,
       isMyActive: false,
@@ -40,10 +44,13 @@ export default {
   },
   methods: {
     getLatestTopics: async function () {
-      let topics =  await apiClient.getTopics(this.skip, this.offset);
-      if (typeof topics == 'object') {
-          this.topics = topics.topics;
+      this.setActiveFilter({ latest: true });
+      let topics =  await apiClient.getLatestTopics(this.skip, this.offset);
+      if (topics) {
+        this.topics = topics.topics;
+        return;
       }
+      this.topics = [];
     },
     getFavorites: async function () {
       this.setActiveFilter({ favorites: true });
@@ -51,10 +58,19 @@ export default {
       
       if (favorites) {
         this.topics = favorites.topics;
+        return;
       }
+      this.topics = [];
     },
     getDiscussed: async function () {
       this.setActiveFilter({ discussed: true });
+      let discussed = await apiClient.getDiscussed();
+      
+      if (discussed) {
+        this.topics = discussed.topics;
+        return;
+      }
+      this.topics = [];
     },
     getMy: async function () {
       this.setActiveFilter({ my: true });
@@ -62,9 +78,12 @@ export default {
 
       if (my) {
         this.topics = my.topics;
+        return;
       }
+      this.topics = [];
     },
-    setActiveFilter({discussed = false, favorites = false, my = false}) {
+    setActiveFilter({latest = false, discussed = false, favorites = false, my = false}) {
+      this.isLatestActive = latest;
       this.isFavoriteActive = favorites;
       this.isDisscussedActive = discussed;
       this.isMyActive = my;

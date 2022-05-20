@@ -8,8 +8,9 @@ export default {
   register,
   getMe,
   getTopic,
-  getTopics,
+  getLatestTopics: getTopics,
   getFavorites,
+  getDiscussed,
   getMyTopics,
   createTopic,
   addToFavorites,
@@ -24,7 +25,7 @@ export default {
 }
 
 const apiHosts = {
-  localhost: "http://localhost:5000",
+  localhost: "http://localhost:5005",
 }
 
 const apiPrefixes = {
@@ -42,6 +43,7 @@ const apiUrls = {
   favorites: "/favorites",
   search: "/search",
   my: "/my",
+  discussed: "/discussed",
   me: "/me",
 }
 
@@ -139,6 +141,17 @@ async function getFavorites() {
   let response = await fetchApi(
     getUrl({
       suffix: apiUrls.topics + apiUrls.favorites
+    }),
+    requestOptionsService.get()
+  );
+
+  return response;
+}
+
+async function getDiscussed() {
+  let response = await fetchApi(
+    getUrl({
+      suffix: apiUrls.topics + apiUrls.discussed
     }),
     requestOptionsService.get()
   );
