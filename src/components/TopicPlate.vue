@@ -158,6 +158,7 @@ export default {
   margin-left: 1%;
 }
 .topic-tag {
+  display: flex;
   border-radius: 6px;
   background-color: #00C896;
   color:#F2ECFF;

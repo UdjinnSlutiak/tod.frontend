@@ -12,8 +12,11 @@ export default {
   getFavorites,
   getDiscussed,
   getMyTopics,
+  getRecommendedTopics,
   createTopic,
   addToFavorites,
+  getUserInterestTags,
+  updateUserInterestTags,
   searchTopics,
   getTopicCommentaries,
   createCommentary,
@@ -41,10 +44,12 @@ const apiUrls = {
   commentaries: "/commentaries",
   reactions: "/reactions",
   favorites: "/favorites",
+  recommended: "/recommended",
   search: "/search",
   my: "/my",
   discussed: "/discussed",
   me: "/me",
+  interests: "/interests",
 }
 
 function getUrl({
@@ -170,6 +175,17 @@ async function getMyTopics() {
   return response;
 }
 
+async function getRecommendedTopics() {
+  let response = await fetchApi(
+    getUrl({
+      suffix: apiUrls.topics + apiUrls.recommended
+    }),
+    requestOptionsService.get()
+  );
+
+  return response;
+}
+
 async function createTopic(topicObject) {
   let response = await fetchApi(
     getUrl({
@@ -187,6 +203,28 @@ async function addToFavorites(id) {
       suffix: apiUrls.topics + "/" + id + apiUrls.favorites
     }),
     requestOptionsService.post()
+  );
+
+  return response;
+}
+
+async function getUserInterestTags() {
+  let response = await fetchApi(
+    getUrl({
+      suffix: apiUrls.account + apiUrls.interests
+    }),
+    requestOptionsService.get()
+  );
+
+  return response;
+}
+
+async function updateUserInterestTags(tagsText) {
+  let response = await fetchApi(
+    getUrl({
+      suffix: apiUrls.account + apiUrls.interests
+    }),
+    requestOptionsService.put(tagsText)
   );
 
   return response;
@@ -313,5 +351,5 @@ async function fetchApi(path, options) {
     return "OK";
   }
 
-  throw { status: response.status, statusText: response.statusText, text: await response.text() }
+  throw { status: response.status, statusText: response.statusText, text: JSON.parse(await response.text()) }
 }

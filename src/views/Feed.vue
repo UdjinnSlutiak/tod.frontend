@@ -4,6 +4,9 @@
       <div @click="getLatestTopics()" :class="{'active-item': isLatestActive}" class="filter-item">
         <span class="material-icons">access_time_filled</span>
       </div>
+      <div v-if="authObject" @click="getRecommended()" :class="{'active-item': isRecommendedActive}" class="filter-item">
+        <span class="material-icons">tag</span>
+      </div>
       <div v-if="authObject" @click="getFavorites()" :class="{'active-item': isFavoriteActive}" class="filter-item">
         <span class="material-icons">bookmarks</span>
       </div>
@@ -37,6 +40,7 @@ export default {
       skip: 0,
       offset: 20,
       isLatestActive: true,
+      isRecommendedActive: false,
       isFavoriteActive: false,
       isDisscussedActive: false,
       isMyActive: false,
@@ -46,8 +50,19 @@ export default {
     getLatestTopics: async function () {
       this.setActiveFilter({ latest: true });
       let topics =  await apiClient.getLatestTopics(this.skip, this.offset);
+      
       if (topics) {
         this.topics = topics.topics;
+        return;
+      }
+      this.topics = [];
+    },
+    getRecommended: async function () {
+      this.setActiveFilter({ recommended: true });
+      let recommended = await apiClient.getRecommendedTopics();
+
+      if (recommended) {
+        this.topics = recommended.topics;
         return;
       }
       this.topics = [];
@@ -82,8 +97,9 @@ export default {
       }
       this.topics = [];
     },
-    setActiveFilter({latest = false, discussed = false, favorites = false, my = false}) {
+    setActiveFilter({ latest = false, recommended = false, discussed = false, favorites = false, my = false }) {
       this.isLatestActive = latest;
+      this.isRecommendedActive = recommended;
       this.isFavoriteActive = favorites;
       this.isDisscussedActive = discussed;
       this.isMyActive = my;

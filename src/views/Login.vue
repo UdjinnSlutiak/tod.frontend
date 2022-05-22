@@ -27,7 +27,7 @@ export default {
       try {
         await authenticationService.register(registerObject);
       } catch (error) {
-        this.registerException = JSON.parse(error.text);
+        this.registerException = error.text;
         return;
       }
 
