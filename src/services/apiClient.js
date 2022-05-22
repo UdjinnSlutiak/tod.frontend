@@ -14,12 +14,14 @@ export default {
   getMyTopics,
   getRecommendedTopics,
   createTopic,
+  deleteTopic,
   addToFavorites,
   getUserInterestTags,
   updateUserInterestTags,
   searchTopics,
   getTopicCommentaries,
   createCommentary,
+  deleteCommentary,
   getUserTopicReaction,
   getUserCommentariesReaction,
   getUserCommentaryReaction,
@@ -197,6 +199,17 @@ async function createTopic(topicObject) {
   return response;
 }
 
+async function deleteTopic(id) {
+  let response = await fetchApi(
+    getUrl({
+      suffix: apiUrls.topics + "/" + id
+    }),
+    requestOptionsService.delete()
+  );
+
+  return response;
+}
+
 async function addToFavorites(id) {
   let response = await fetchApi(
     getUrl({
@@ -258,6 +271,17 @@ async function createCommentary(topicId, commentaryObject) {
       suffix: apiUrls.topics + "/" + topicId + apiUrls.commentaries
     }),
     requestOptionsService.post(commentaryObject)
+  );
+
+  return response;
+}
+
+async function deleteCommentary(id) {
+  let response = await fetchApi(
+    getUrl({
+      suffix: apiUrls.commentaries + "/" + id
+    }),
+    requestOptionsService.delete()
   );
 
   return response;
@@ -345,7 +369,7 @@ async function fetchApi(path, options) {
     try {
       return await response.json();
     } catch (error) {
-      console.log(error.message);
+      console.log(error);
     }
 
     return "OK";
