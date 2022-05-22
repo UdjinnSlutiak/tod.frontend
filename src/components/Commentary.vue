@@ -4,33 +4,44 @@
       {{commentaryObject.text}}
     </div>
     <div class="commentary-info">
-      <div style="display: flex; z-index: 10;">
+      <div style="display: flex;">
         <div @click="react(commentaryObject.id, 1)" v-if="!userContent && authObject" class="text-success" style="cursor: pointer;">
           <span class="material-icons reaction" :class="{'reacted': reactedPositive && reacted}">thumb_up</span>
         </div>
-        <div v-bind:class="{'text-success': rating > 0, 'text-danger': rating < 0}" style="margin: 0 8%; display: flex;">
+        <div v-bind:class="{'text-success': rating > 0, 'text-danger': rating < 0}" style="margin: auto 8%; display: flex;">
           <span v-if="userContent || !authObject" style="margin-right: 8%;" class="material-icons">thumbs_up_down</span>
-          {{rating}}
+          <label style="margin: auto 5%;">{{rating}}</label>
         </div>
         <div @click="react(commentaryObject.id, -1)" v-if="!userContent && authObject" class="text-danger" style="cursor: pointer;">
           <span class="material-icons reaction" :class="{'reacted': !reactedPositive && reacted}">thumb_down</span>
         </div>
+        <div @click="editCommentary()" v-if="userContent && authObject" class="action">
+          <span class="material-icons">edit</span>
+        </div>
+        <div @click="showDeleteDialog = true;" v-if="userContent && authObject" class="action-danger">
+          <span class="material-icons">delete</span>
+        </div>
       </div>
-      <div v-if="!userContent">
+      <div v-if="!userContent" style="margin: auto 0;">
         {{commentaryObject.author.username}} at {{getDateTime(commentaryObject.createdUtc)}}
       </div>
-      <div v-else>
+      <div v-else style="margin: auto 0;">
         me at {{getDateTime(commentaryObject.createdUtc)}}
       </div>
     </div>
   </div>
+  <delete-dialog v-if="showDeleteDialog" @onDeleteDialogConfirmed="deleteCommentary" :contentType="'commentary'"></delete-dialog>
 </template>
 
 <script>
 import apiClient from "../services/apiClient";
+import DeleteDialog from "./modals/dialogs/DeleteDialog.vue";
 
 export default {
   name: "commentary",
+  components: {
+    DeleteDialog,
+  },
   mounted: async function () {
     this.userContent = this.currentUserContent(this.commentaryObject.author.username);
     this.rating = this.commentaryObject.rating;
@@ -42,6 +53,7 @@ export default {
       reaction: {},
       reacted: false,
       reactedPositive: false,
+      showDeleteDialog: false,
     }
   },
   methods: {
@@ -73,6 +85,7 @@ export default {
       }
 
       if (response != "OK") {
+        this.reaction = response;
         return;
       }
       this.rating += value;
@@ -80,6 +93,20 @@ export default {
       this.rating += this.reaction.reacted ? value : 0;
       this.reacted = true;
       this.reactedPositive = value == 1;
+    },
+    editCommentary: async function () {
+
+    },
+    deleteCommentary: async function (result) {
+      this.showDeleteDialog = false;
+      if (!result) {
+        return;
+      }
+
+      let response = apiClient.deleteCommentary(this.commentaryObject.id);
+      if (response) {
+        this.$router.push("/feed");
+      }
     },
   },
   props: {
@@ -114,7 +141,6 @@ export default {
   max-width: 70%;
   min-width: min-content;
   padding: 1.5% 1.5% 1% 1.5%;
-  z-index: 1;
 }
 .your-commentary {
   text-align: right;
@@ -131,17 +157,8 @@ export default {
 .commentary-info {
   display: flex;
   font-style: italic;
-  opacity: 0.8;
   font-size:smaller;
   justify-content: space-between;
   margin-top: 0.5%;
-}
-.text-success {
-  color:greenyellow;
-  opacity: 0.9 !important;
-}
-.text-danger {
-  color:indianred;
-  opacity: 1 !important;
 }
 </style>
