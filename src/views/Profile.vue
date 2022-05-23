@@ -32,12 +32,12 @@
         <div v-if="tags.length == 0" style="margin: auto auto 0 auto;">
           <label style="color: indianred; margin: auto;">Note: press 'ENTER' after finishing each of your tags.</label>
         </div>
-        <div v-else class="topic-tags" style="margin: 0 auto; width: 60%;">
-          <div v-for="tag in tags" v-bind:key="tag" class="topic-tag" style="padding: 0.6%;">
+        <div v-else class="topic-tags" style="width: 60%;">
+          <div v-for="tag in tags" v-bind:key="tag" class="topic-tag" style="padding: 1.5%; margin: 1.5%;">
             {{tag.text}}
           </div>
-          <div class="topic-tag" style="padding: 0.6%; background-color: indianred;">
-            <span @click="removeLastTag()" class="material-icons" style="font-size: inherit !important;">close</span>
+          <div class="topic-tag" style="background-color: indianred;">
+            <span @click="removeLastTag()" class="material-icons" style="font-size: inherit !important; margin:auto; padding: 0.5% 1.5%;">close</span>
           </div>
         </div>
       </div>

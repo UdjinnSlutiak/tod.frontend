@@ -14,6 +14,7 @@ export default {
   getMyTopics,
   getRecommendedTopics,
   createTopic,
+  updateTopic,
   deleteTopic,
   addToFavorites,
   getUserInterestTags,
@@ -21,6 +22,7 @@ export default {
   searchTopics,
   getTopicCommentaries,
   createCommentary,
+  updateCommentary,
   deleteCommentary,
   getUserTopicReaction,
   getUserCommentariesReaction,
@@ -199,6 +201,17 @@ async function createTopic(topicObject) {
   return response;
 }
 
+async function updateTopic(id, topicObject) {
+  let response = await fetchApi(
+    getUrl({
+      suffix: apiUrls.topics + "/" + id
+    }),
+    requestOptionsService.put(topicObject)
+  );
+
+  return response;
+}
+
 async function deleteTopic(id) {
   let response = await fetchApi(
     getUrl({
@@ -271,6 +284,17 @@ async function createCommentary(topicId, commentaryObject) {
       suffix: apiUrls.topics + "/" + topicId + apiUrls.commentaries
     }),
     requestOptionsService.post(commentaryObject)
+  );
+
+  return response;
+}
+
+async function updateCommentary(id, text) {
+  let response = await fetchApi(
+    getUrl({
+      suffix: apiUrls.commentaries + "/" + id
+    }),
+    requestOptionsService.put({ text: text })
   );
 
   return response;
