@@ -1,7 +1,7 @@
 <template>
   <div class="commentary" v-bind:class="this.getCommentaryClass(commentaryObject.author.username)">
     <div>
-      {{commentaryObject.text}}
+      {{text}}
     </div>
     <div class="commentary-info">
       <div style="display: flex;">
@@ -15,7 +15,7 @@
         <div @click="react(commentaryObject.id, -1)" v-if="!userContent && authObject" class="text-danger" style="cursor: pointer;">
           <span class="material-icons reaction" :class="{'reacted': !reactedPositive && reacted}">thumb_down</span>
         </div>
-        <div @click="editCommentary()" v-if="userContent && authObject" class="action">
+        <div @click="showCommentaryForm = true;" v-if="userContent && authObject" class="action">
           <span class="material-icons">edit</span>
         </div>
         <div @click="showDeleteDialog = true;" v-if="userContent && authObject" class="action-danger">
@@ -31,29 +31,35 @@
     </div>
   </div>
   <delete-dialog v-if="showDeleteDialog" @onDeleteDialogConfirmed="deleteCommentary" :contentType="'commentary'"></delete-dialog>
+  <commentary-form v-if="showCommentaryForm" @onEditConfirmed="updateCommentary" :commentaryText="text"></commentary-form>
 </template>
 
 <script>
 import apiClient from "../services/apiClient";
 import DeleteDialog from "./modals/dialogs/DeleteDialog.vue";
+import CommentaryForm from "./forms/CommentaryForm.vue";
 
 export default {
   name: "commentary",
   components: {
     DeleteDialog,
+    CommentaryForm,
   },
   mounted: async function () {
     this.userContent = this.currentUserContent(this.commentaryObject.author.username);
     this.rating = this.commentaryObject.rating;
+    this.text = this.commentaryObject.text;
   },
   data() {
     return {
       userContent: false,
+      text: "",
       rating: 0,
       reaction: {},
       reacted: false,
       reactedPositive: false,
       showDeleteDialog: false,
+      showCommentaryForm: false,
     }
   },
   methods: {
@@ -94,8 +100,19 @@ export default {
       this.reacted = true;
       this.reactedPositive = value == 1;
     },
-    editCommentary: async function () {
+    updateCommentary: async function (result) {
+      this.showCommentaryForm = false;
+      if (!result) {
+        return;
+      }
+      if (result == this.text) {
+        return;
+      }
 
+      let response = await apiClient.updateCommentary(this.commentaryObject.id, result);
+      if (response) {
+        this.text = result;
+      }
     },
     deleteCommentary: async function (result) {
       this.showDeleteDialog = false;
