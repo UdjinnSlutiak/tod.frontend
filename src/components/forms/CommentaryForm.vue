@@ -47,6 +47,7 @@ export default {
   background-color: #4F4F4F;
   width: 60%;
   z-index: 3;
+  border-radius: 12px;
 }
 .modal-textarea {
   border-radius: 10px;

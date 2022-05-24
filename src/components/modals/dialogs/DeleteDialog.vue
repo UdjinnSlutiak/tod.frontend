@@ -68,15 +68,15 @@ export default {
   cursor: pointer;
 }
 .delete-dialog-button {
-  background-color: #985D6C;
+  background-color: #985D6C !important;
 }
 .delete-dialog-button:hover {
-  background-color: #985D6C;
+  background-color: #985D6C !important;
 }
 .cancel-dialog-button {
-  background-color: #00C896;
+  background-color: #00C896 !important;
 }
 .cancel-dialog-button:hover {
-  background-color: #00C896;
+  background-color: #00C896 !important;
 }
 </style>

@@ -12,7 +12,7 @@
       </router-link>
     </div>
     <div class="navbar-container" style="text-align: right;">
-      <router-link active-class="active-item" to="/topic/create" class="nav-item nav-item-right" v-if="authObject">
+      <router-link @click="showTopicForm = true;" :class="{'active-item': showTopicForm}" to="" class="nav-item nav-item-right" v-if="authObject">
         <span class="material-icons">post_add</span>
       </router-link>
       <router-link active-class="active-item" to="/profile" class="nav-item nav-item-right" v-if="authObject">
@@ -26,24 +26,35 @@
       </router-link>
     </div>
   </div>
+  <topic-form v-if="showTopicForm" :isCreating="true" @onTopicFormConfirmed="topicFormConfirmed"></topic-form>
 </template>
 
 <script>
 import authenticationService from "../services/authenticationService";
-
+import TopicForm from "./forms/TopicForm.vue";
 
 export default {
   name: "navbar",
+  components: {
+    TopicForm,
+  },
   mounted: async function () {
   },
   data() {
     return {
+      showTopicForm: false,
     }
   },
   methods: {
     logout: async function () {
       await authenticationService.logout();
       this.$router.push("/login");
+    },
+    topicFormConfirmed: function (result) {
+      this.showTopicForm = false;
+      if (result) {
+        this.$router.push("/topic/" + result);
+      }
     },
   },
   computed: {
