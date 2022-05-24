@@ -1,10 +1,10 @@
 <template>
   <div class="topic-plate">
     <div class="topic-title" @click="this.openTopic(topicObject.id)">
-      {{topicObject.title}}
+      {{title}}
     </div>
     <div class="topic-tags">
-      <div class="topic-tag" v-for="tag in topicObject.tags" v-bind:key="tag.usedCount">
+      <div class="topic-tag" v-for="tag in tags" v-bind:key="tag.usedCount">
         {{tag.text}}
       </div>
     </div>
@@ -26,7 +26,7 @@
         <div v-if="!userContent && authObject && isInFavorite" class="text-success" style="margin: 0 15%;">
             <span class="material-icons">bookmark_added</span>
         </div>
-        <div @click="editTopic()" v-if="userContent && authObject" class="action">
+        <div @click="showEditForm = true;" v-if="userContent && authObject" class="action">
           <span class="material-icons">edit</span>
         </div>
         <div @click="showDeleteDialog = true;" v-if="userContent && authObject" class="action-danger">
@@ -42,28 +42,39 @@
     </div>
   </div>
   <delete-dialog @onDeleteDialogConfirmed="deleteTopic" v-if="showDeleteDialog" :contentType="'topic'"></delete-dialog>
+  <topic-form v-if="showEditForm" @onTopicFormConfirmed="editConfirmed" :isCreating="false" :topicId="topicObject.id" :topicTitle="topicObject.title" :topicTags="tagsText"></topic-form>
 </template>
 
 <script>
 import apiClient from "../services/apiClient";
 import DeleteDialog from "./modals/dialogs/DeleteDialog.vue";
+import TopicForm from "./forms/TopicForm.vue";
 
 export default {
   name: "topic-plate",
   components: {
     DeleteDialog,
+    TopicForm,
   },
   mounted: async function () {
     this.userContent = this.currentUserContent(this.topicObject.author.username);
+    if (this.userContent) {
+      this.getTagsText();
+    }
+
+    this.title = this.topicObject.title;
+    this.tags = this.topicObject.tags;
     this.rating = this.topicObject.rating;
     this.isInFavorite = this.topicObject.isInFavorite;
-    
+
     if (this.authObject && !this.userContent) {
       await this.getReaction();
     }
+
   },
   data() {
     return {
+      title: "",
       userContent: false,
       rating: 0,
       isInFavorite: false,
@@ -71,6 +82,9 @@ export default {
       reaction: {},
       reacted: false,
       showDeleteDialog: false,
+      showEditForm: false,
+      tagsText: [],
+      tags: [],
     }
   },
   methods: {
@@ -126,8 +140,12 @@ export default {
         this.reacted = response.reacted;
       }
     },
-    editTopic: async function () {
-
+    editConfirmed: function (result) {
+      this.showEditForm = false;
+      if (result) {
+        this.title = result.title;
+        this.tags = result.tags;
+      }
     },
     deleteTopic: async function (result) {
       this.showDeleteDialog = false;
@@ -139,6 +157,9 @@ export default {
       if (response) {
         this.$router.push("/feed");
       }
+    },
+    getTagsText: function () {
+      this.topicObject.tags.forEach(element => this.tagsText.push(element.text));
     },
   },
   props: {
